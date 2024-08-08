@@ -6,7 +6,6 @@ namespace IgdbApi.Lib
 {
     // https://www.igdb.com/
     // https://api-docs.igdb.com/#authentication
-    // "fields *; where id = (6,9,12); limit 500;"
 
     public class Igdb
     {
@@ -28,20 +27,37 @@ namespace IgdbApi.Lib
             }
         }
 
-        public void GetCoverArtUrl(string nameOfGame)
+        public FullGameData GetAllDataOnAGame(string nameOfGame)
         {
-            List<Game> gameResults = GetGames(nameOfGame);
+            FullGameData fullGameData = new FullGameData();
 
-            Game gameMatch = gameResults.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
+            List<Game> games = GetGamesByName(nameOfGame);
 
-            if (gameMatch != null)
+            fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
+
+            if (fullGameData.Game != null)
             {
-                List<GameDetails> gameIdResults = GetGameById(gameMatch.id.ToString());
-                List<Cover> gameCovers = GetCover(gameIdResults[0].cover.ToString());
+                string involvedCompaniesIds = String.Join(",", fullGameData.Game.involved_companies);
+
+                fullGameData.InvolvedCompanies = GetInvolvedCompanies(involvedCompaniesIds);
+                fullGameData.GameDetails = GetGameById(fullGameData.Game.id.ToString());
+
+                string platformIds = String.Join(",", fullGameData.GameDetails[0].platforms);
+
+                fullGameData.Platforms = GetPlatforms(platformIds);
+                fullGameData.Covers = GetCover(fullGameData.GameDetails[0].cover.ToString());
             }
+
+            return fullGameData;
         }
 
-        public List<Game> GetGames(string nameOfGame)
+        /// <summary>
+        /// Get basic data on a game by a search against its name
+        /// - Calls the 'games' endpoint
+        /// </summary>
+        /// <param name="nameOfGame"></param>
+        /// <returns></returns>
+        public List<Game> GetGamesByName(string nameOfGame)
         {
             RestRequest request = new RestRequest("/games");
             request.AddHeader("Client-ID", _clientId);
@@ -61,6 +77,12 @@ namespace IgdbApi.Lib
             return games;
         }
 
+        /// <summary>
+        /// Get various data on a game by a search against its ID
+        /// - Calls the 'games' endpoint
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
         public List<GameDetails> GetGameById(string gameId)
         {
             RestRequest request = new RestRequest("/games");
@@ -81,6 +103,12 @@ namespace IgdbApi.Lib
             return gameDetails;
         }
 
+        /// <summary>
+        /// Get the cover art of games
+        /// - Calls the 'covers' endpoint
+        /// </summary>
+        /// <param name="coverId"></param>
+        /// <returns></returns>
         public List<Cover> GetCover(string coverId)
         {
             RestRequest request = new RestRequest("/covers");
@@ -103,15 +131,16 @@ namespace IgdbApi.Lib
 
         /// <summary>
         /// Gaming Platforms
+        /// - Calls the 'platforms' endpoint
         /// - Requires a limit set otherwise it just returns a default of 10 results only
         /// </summary>
         /// <param name="resultLimit"></param>
-        public void GetPlatforms(int resultLimit = 500)
+        public List<Platform> GetPlatforms(string platformIds, int resultLimit = 500)
         {
             RestRequest request = new RestRequest("/platforms");
             request.AddHeader("Client-ID", _clientId);
             request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; limit " + resultLimit + ";");
+            request.AddBody("fields *; where id = (" + platformIds + "); limit " + resultLimit + ";");
 
             RestResponse response = _client.Execute(request, Method.Post);
 
@@ -122,10 +151,38 @@ namespace IgdbApi.Lib
                 string rawResponse = response.Content;
                 platforms = JsonConvert.DeserializeObject<List<Platform>>(rawResponse);
             }
+
+            return platforms;
+        }
+
+        /// <summary>
+        /// Gets information on the companies associated with a game
+        /// - Calls the 'involved_companies' endpoint
+        /// </summary>
+        /// <param name="involvedCompaniesIds"></param>
+        public List<InvolvedCompanies> GetInvolvedCompanies(string involvedCompaniesIds)
+        {
+            RestRequest request = new RestRequest("/involved_companies");
+            request.AddHeader("Client-ID", _clientId);
+            request.AddHeader("Authorization", "Bearer " + _token.access_token);
+            request.AddBody("fields *; where id = (" + involvedCompaniesIds + ");");
+
+            RestResponse response = _client.Execute(request, Method.Post);
+
+            List<InvolvedCompanies> involvedCompanies = new List<InvolvedCompanies>();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                string rawResponse = response.Content;
+                involvedCompanies = JsonConvert.DeserializeObject<List<InvolvedCompanies>>(rawResponse);
+            }
+
+            return involvedCompanies;
         }
 
         /// <summary>
         /// Searches all endpoints
+        /// - Calls the 'search' endpoint
         /// - Search is usable on: Characters, Collections, Games, Platforms, and Themes
         /// </summary>
         /// <param name="keyword"></param>

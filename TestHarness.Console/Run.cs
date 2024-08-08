@@ -9,9 +9,7 @@ namespace TestHarness.Console
             Igdb igdb = new Igdb();
 
             igdb.GetTwitchAccessToken();
-            //igdb.GetCoverArtUrl("Fallout: New Vegas");
-
-            igdb.GetPlatforms();
+            igdb.GetAllDataOnAGame("Fallout: New Vegas");
 
             System.Console.ReadLine();
         }
