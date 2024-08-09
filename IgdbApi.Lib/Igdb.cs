@@ -14,7 +14,7 @@ namespace IgdbApi.Lib
         private Token _token = new Token();
 
         private RestClient _client = new RestClient("https://api.igdb.com/v4");
-        
+
         private const string _clientId = "PRIVATE";
         private const string _clientSecret = "PRIVATE";
 
@@ -53,10 +53,14 @@ namespace IgdbApi.Lib
                 {
                     string artworkIds = String.Join(",", fullGameData.GameDetails[0].artworks);
                     fullGameData.Artworks = GetArtworks(artworkIds);
+                    fullGameData.LargeArtworkUrls = _processImages.ProcessArrayOfImages(fullGameData.Artworks);
                 }
 
-                fullGameData.Covers = GetCover(fullGameData.GameDetails[0].cover.ToString());
-                fullGameData.LargeCoverUrl = _processImages.ProcessCoverUrl(fullGameData.Covers[0].url);
+                if(fullGameData.GameDetails[0].cover != 0)
+                {
+                    fullGameData.Covers = GetCover(fullGameData.GameDetails[0].cover.ToString());
+                    fullGameData.LargeCoverUrl = _processImages.ProcessCoverUrl(fullGameData.Covers[0].url);
+                }
             }
 
             return fullGameData;

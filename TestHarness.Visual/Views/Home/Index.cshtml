@@ -3,7 +3,7 @@
 @model FullGameData;
 
 @{
-    ViewData["Title"] = @Model.GameDetails[0].name;
+    ViewData["Title"] = Model.GameDetails[0].name;
 }
 
 <div>
@@ -24,5 +24,19 @@
     <h2>Storyline:</h2>
 
     @Model.GameDetails[0].storyline
+
+    <p></p>
+
+    <h2>Artwork:</h2>
+
+    @{
+        if (Model.LargeArtworkUrls != null)
+        {
+            foreach (string item in Model.LargeArtworkUrls)
+            {
+                <img src="@item" />
+            }
+        }
+    }
 
 </div>

@@ -1,4 +1,6 @@
-﻿namespace IgdbApi.Lib.Class
+﻿using IgdbApi.Lib.Models;
+
+namespace IgdbApi.Lib.Class
 {
     public class ProcessImages
     {
@@ -18,6 +20,18 @@
             urlElements[6] = urlElements[6] + "cover_big";
 
             return String.Join("/", urlElements);
+        }
+
+        public List<string> ProcessArrayOfImages(List<Artworks> artworks)
+        {
+            List<string> urls = new List<string>();
+
+            foreach(Artworks item in artworks)
+            {
+                urls.Add(ProcessCoverUrl(item.url));
+            }
+
+            return urls;
         }
     }
 }

@@ -8,7 +8,7 @@
         public List<Cover> Covers { get; set; }
         public List<InvolvedCompanies> InvolvedCompanies { get; set; }
         public List<Artworks> Artworks { get; set; }
-
         public string LargeCoverUrl { get; set; }
+        public List<string> LargeArtworkUrls { get; set; }
     }
 }

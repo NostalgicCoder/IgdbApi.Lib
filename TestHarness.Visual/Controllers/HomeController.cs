@@ -15,13 +15,13 @@ namespace TestHarness.Visual.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string nameOfGame)
         {
             _igdb.GetTwitchAccessToken();
 
-            FullGameData fullGameData = _igdb.GetAllDataOnAGame("Doom");
+            FullGameData fullGameData = _igdb.GetAllDataOnAGame(nameOfGame);
 
-            if(fullGameData.Game != null)
+            if(fullGameData.Game != null && fullGameData.Covers != null)
             {
                 return View(fullGameData);
             }

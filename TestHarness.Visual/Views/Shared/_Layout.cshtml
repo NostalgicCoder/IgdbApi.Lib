@@ -22,6 +22,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <li>
+                            <form asp-controller="Home" asp-action="Index" method="get">
+                                <input name="nameOfGame" style="width:200px" />
+                                <button type="submit">Submit</button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
