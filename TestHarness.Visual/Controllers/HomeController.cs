@@ -19,7 +19,7 @@ namespace TestHarness.Visual.Controllers
         {
             _igdb.GetTwitchAccessToken();
 
-            FullGameData fullGameData = _igdb.GetAllDataOnAGame("doom");
+            FullGameData fullGameData = _igdb.GetAllDataOnAGame("Doom");
 
             if(fullGameData.Game != null)
             {

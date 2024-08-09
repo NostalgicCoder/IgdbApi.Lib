@@ -11,24 +11,12 @@ namespace IgdbApi.Lib
     public class Igdb
     {
         private ProcessImages _processImages = new ProcessImages();
-
-        private RestClient _client = new RestClient("https://api.igdb.com/v4");
         private Token _token = new Token();
 
+        private RestClient _client = new RestClient("https://api.igdb.com/v4");
+        
         private const string _clientId = "PRIVATE";
         private const string _clientSecret = "PRIVATE";
-
-        public void GetTwitchAccessToken()
-        {
-            RestRequest request = new RestRequest("https://id.twitch.tv/oauth2/token?client_id=" + _clientId + "&client_secret=" + _clientSecret + "&grant_type=client_credentials");
-            RestResponse response = _client.Execute(request, Method.Post);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                _token = JsonConvert.DeserializeObject<Token>(rawResponse);
-            }
-        }
 
         public FullGameData GetAllDataOnAGame(string nameOfGame)
         {
@@ -75,6 +63,45 @@ namespace IgdbApi.Lib
         }
 
         /// <summary>
+        /// Get the access token from Twitch that is required for access to IGDB API
+        /// - Pass over 'clientId' and 'clientSecret' that is unique to the user
+        /// </summary>
+        public void GetTwitchAccessToken()
+        {
+            RestRequest request = new RestRequest("https://id.twitch.tv/oauth2/token?client_id=" + _clientId + "&client_secret=" + _clientSecret + "&grant_type=client_credentials");
+            RestResponse response = _client.Execute(request, Method.Post);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                string rawResponse = response.Content;
+                _token = JsonConvert.DeserializeObject<Token>(rawResponse);
+            }
+        }
+
+        /// <summary>
+        /// Call the IGDB (Internet Gaming Database) API
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <param name="headerBody"></param>
+        /// <returns></returns>
+        private string CallIgdbApi(string endpoint, string headerBody)
+        {
+            RestRequest request = new RestRequest(endpoint);
+            request.AddHeader("Client-ID", _clientId);
+            request.AddHeader("Authorization", "Bearer " + _token.access_token);
+            request.AddBody(headerBody);
+
+            RestResponse response = _client.Execute(request, Method.Post);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Content;
+            }
+
+            return null; ;
+        }
+
+        /// <summary>
         /// Get basic data on a game by a search against its name
         /// - Calls the 'games' endpoint
         /// </summary>
@@ -82,20 +109,11 @@ namespace IgdbApi.Lib
         /// <returns></returns>
         public List<Game> GetGamesByName(string nameOfGame)
         {
-            RestRequest request = new RestRequest("/games");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields name, involved_companies; search \"" + nameOfGame + "\";");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<Game> games = new List<Game>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                games = JsonConvert.DeserializeObject<List<Game>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.Games, "fields name, involved_companies; search \"" + nameOfGame + "\";");
+
+            games = JsonConvert.DeserializeObject<List<Game>>(response);
 
             return games;
         }
@@ -108,20 +126,11 @@ namespace IgdbApi.Lib
         /// <returns></returns>
         public List<GameDetails> GetGameById(string gameId)
         {
-            RestRequest request = new RestRequest("/games");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; where id = " + gameId + ";");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<GameDetails> gameDetails = new List<GameDetails>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                gameDetails = JsonConvert.DeserializeObject<List<GameDetails>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.Games, "fields *; where id = " + gameId + ";");
+
+            gameDetails = JsonConvert.DeserializeObject<List<GameDetails>>(response);
 
             return gameDetails;
         }
@@ -134,46 +143,30 @@ namespace IgdbApi.Lib
         /// <returns></returns>
         public List<Cover> GetCover(string coverId)
         {
-            RestRequest request = new RestRequest("/covers");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; where id = " + coverId + ";");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<Cover> covers = new List<Cover>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                covers = JsonConvert.DeserializeObject<List<Cover>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.Covers, "fields *; where id = " + coverId + ";");
+
+            covers = JsonConvert.DeserializeObject<List<Cover>>(response);
 
             return covers;
         }
 
+
         /// <summary>
-        /// Gaming Platforms
-        /// - Calls the 'platforms' endpoint
+        /// Calls the 'platforms' endpoint
         /// - Requires a limit set otherwise it just returns a default of 10 results only
         /// </summary>
+        /// <param name="platformIds"></param>
         /// <param name="resultLimit"></param>
+        /// <returns></returns>
         public List<Platform> GetPlatforms(string platformIds, int resultLimit = 500)
         {
-            RestRequest request = new RestRequest("/platforms");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; where id = (" + platformIds + "); limit " + resultLimit + ";");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<Platform> platforms = new List<Platform>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                platforms = JsonConvert.DeserializeObject<List<Platform>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.Platforms, "fields *; where id = (" + platformIds + "); limit " + resultLimit + ";");
+
+            platforms = JsonConvert.DeserializeObject<List<Platform>>(response);
 
             return platforms;
         }
@@ -183,22 +176,14 @@ namespace IgdbApi.Lib
         /// - Calls the 'involved_companies' endpoint
         /// </summary>
         /// <param name="involvedCompaniesIds"></param>
+        /// <returns></returns>
         public List<InvolvedCompanies> GetInvolvedCompanies(string involvedCompaniesIds)
         {
-            RestRequest request = new RestRequest("/involved_companies");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; where id = (" + involvedCompaniesIds + ");");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<InvolvedCompanies> involvedCompanies = new List<InvolvedCompanies>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                involvedCompanies = JsonConvert.DeserializeObject<List<InvolvedCompanies>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.InvolvedCompanies, "fields *; where id = (" + involvedCompaniesIds + ");");
+
+            involvedCompanies = JsonConvert.DeserializeObject<List<InvolvedCompanies>>(response);
 
             return involvedCompanies;
         }
@@ -211,20 +196,11 @@ namespace IgdbApi.Lib
         /// <returns></returns>
         public List<Artworks> GetArtworks(string artworkIds)
         {
-            RestRequest request = new RestRequest("/artworks");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; where id = (" + artworkIds + ");");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<Artworks> artworks = new List<Artworks>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                artworks = JsonConvert.DeserializeObject<List<Artworks>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.Artworks, "fields *; where id = (" + artworkIds + ");");
+
+            artworks = JsonConvert.DeserializeObject<List<Artworks>>(response);
 
             return artworks;
         }
@@ -236,22 +212,16 @@ namespace IgdbApi.Lib
         /// </summary>
         /// <param name="keyword"></param>
         /// <param name="resultLimit"></param>
-        public void Search(string keyword, int resultLimit = 50)
+        /// <returns></returns>
+        public List<SearchResult> Search(string keyword, int resultLimit = 50)
         {
-            RestRequest request = new RestRequest("/search");
-            request.AddHeader("Client-ID", _clientId);
-            request.AddHeader("Authorization", "Bearer " + _token.access_token);
-            request.AddBody("fields *; search \"" + keyword + "\"; limit " + resultLimit + ";");
-
-            RestResponse response = _client.Execute(request, Method.Post);
-
             List<SearchResult> searchResult = new List<SearchResult>();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                string rawResponse = response.Content;
-                searchResult = JsonConvert.DeserializeObject<List<SearchResult>>(rawResponse);
-            }
+            string response = CallIgdbApi(Endpoints.Search, "fields *; search \"" + keyword + "\"; limit " + resultLimit + ";");
+
+            searchResult = JsonConvert.DeserializeObject<List<SearchResult>>(response);
+
+            return searchResult;
         }
     }
 }
