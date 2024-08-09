@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35201.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IgdbApi.Lib", "IgdbApi.Lib\IgdbApi.Lib.csproj", "{ED1C69DF-A387-4D24-B8E0-D494EFCAE659}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IgdbApi.Lib", "IgdbApi.Lib\IgdbApi.Lib.csproj", "{ED1C69DF-A387-4D24-B8E0-D494EFCAE659}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHarness.Console", "TestHarness.Console\TestHarness.Console.csproj", "{1F5968D1-2D57-4893-BA65-AEF5F4755A04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestHarness.Console", "TestHarness.Console\TestHarness.Console.csproj", "{1F5968D1-2D57-4893-BA65-AEF5F4755A04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHarness.Visual", "TestHarness.Visual\TestHarness.Visual.csproj", "{8E8AE337-3FC1-4C94-B219-F428D17A8A50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{1F5968D1-2D57-4893-BA65-AEF5F4755A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F5968D1-2D57-4893-BA65-AEF5F4755A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F5968D1-2D57-4893-BA65-AEF5F4755A04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E8AE337-3FC1-4C94-B219-F428D17A8A50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E8AE337-3FC1-4C94-B219-F428D17A8A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E8AE337-3FC1-4C94-B219-F428D17A8A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E8AE337-3FC1-4C94-B219-F428D17A8A50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

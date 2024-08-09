@@ -1,12 +1,17 @@
 -----------------------------------------
-8th August 2024:
+IGDB (Internet Game Database) Rest API
 -----------------------------------------
 
-A class library project and console launcher used to demonstrate some of the capabilities of the REST based IGDB (Internet Game Database) API.
+First created on: 08/08/2024
+
+I wanted to add video game cover artwork to another project of mine and didn’t think hosting hundreds of cover art images in my own application was a sensible approach so looked out for available API’s that could achieve the same goal.  I found that the IGDB database had an available free to use rest API so i have begun creating a C# wrapper for this with both a console and a ASP.NET MVC Core website test harness to allow me to call and test the API easily.
+
+This project is still in development and will have further optimization as time goes on.
 
 Technologies / Principles Used:
 
 - C#
+- ASP.NET MVC Core
 - REST
 - IGDB API
 - NET Core (Console & Class Library)
@@ -20,7 +25,11 @@ Resources / Credits:
 
 Images:
 
-N/A
+Visual examples of some of the returned data from the rest based IGDB Api.
+
+![Alt text](Images/Igdb1.jpg)
+![Alt text](Images/Igdb2.jpg)
+![Alt text](Images/Igdb3.jpg)
 
 
 

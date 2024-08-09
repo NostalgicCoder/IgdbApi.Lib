@@ -1,0 +1,28 @@
+﻿@using IgdbApi.Lib.Models
+
+@model FullGameData;
+
+@{
+    ViewData["Title"] = @Model.GameDetails[0].name;
+}
+
+<div>
+
+    <h2>@Model.GameDetails[0].name:</h2>
+
+    <img src="@Model.LargeCoverUrl" width="264" height="374" />
+    <img src="@Model.Covers[0].url"/>
+
+    <p></p>
+
+    <h2>Summary:</h2>
+
+    @Model.GameDetails[0].summary
+
+    <p></p>
+
+    <h2>Storyline:</h2>
+
+    @Model.GameDetails[0].storyline
+
+</div>

@@ -1,4 +1,5 @@
-﻿using IgdbApi.Lib.Models;
+﻿using IgdbApi.Lib.Class;
+using IgdbApi.Lib.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -9,6 +10,8 @@ namespace IgdbApi.Lib
 
     public class Igdb
     {
+        private ProcessImages _processImages = new ProcessImages();
+
         private RestClient _client = new RestClient("https://api.igdb.com/v4");
         private Token _token = new Token();
 
@@ -33,19 +36,39 @@ namespace IgdbApi.Lib
 
             List<Game> games = GetGamesByName(nameOfGame);
 
+            // Check for a full name match
             fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
+
+            if (fullGameData.Game == null)
+            {
+                // Check for a partial name match
+                fullGameData.Game = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower())).FirstOrDefault();
+            }
 
             if (fullGameData.Game != null)
             {
-                string involvedCompaniesIds = String.Join(",", fullGameData.Game.involved_companies);
-
-                fullGameData.InvolvedCompanies = GetInvolvedCompanies(involvedCompaniesIds);
                 fullGameData.GameDetails = GetGameById(fullGameData.Game.id.ToString());
 
-                string platformIds = String.Join(",", fullGameData.GameDetails[0].platforms);
+                if (fullGameData.Game.involved_companies != null)
+                {
+                    string involvedCompaniesIds = String.Join(",", fullGameData.Game.involved_companies);
+                    fullGameData.InvolvedCompanies = GetInvolvedCompanies(involvedCompaniesIds);
+                }
 
-                fullGameData.Platforms = GetPlatforms(platformIds);
+                if (fullGameData.GameDetails[0].platforms != null)
+                {
+                    string platformIds = String.Join(",", fullGameData.GameDetails[0].platforms);
+                    fullGameData.Platforms = GetPlatforms(platformIds);
+                }
+
+                if (fullGameData.GameDetails[0].artworks != null)
+                {
+                    string artworkIds = String.Join(",", fullGameData.GameDetails[0].artworks);
+                    fullGameData.Artworks = GetArtworks(artworkIds);
+                }
+
                 fullGameData.Covers = GetCover(fullGameData.GameDetails[0].cover.ToString());
+                fullGameData.LargeCoverUrl = _processImages.ProcessCoverUrl(fullGameData.Covers[0].url);
             }
 
             return fullGameData;
@@ -178,6 +201,32 @@ namespace IgdbApi.Lib
             }
 
             return involvedCompanies;
+        }
+
+        /// <summary>
+        /// Gets alternative artworks for the game
+        /// - Calls the 'artworks' endpoint
+        /// </summary>
+        /// <param name="artworkIds"></param>
+        /// <returns></returns>
+        public List<Artworks> GetArtworks(string artworkIds)
+        {
+            RestRequest request = new RestRequest("/artworks");
+            request.AddHeader("Client-ID", _clientId);
+            request.AddHeader("Authorization", "Bearer " + _token.access_token);
+            request.AddBody("fields *; where id = (" + artworkIds + ");");
+
+            RestResponse response = _client.Execute(request, Method.Post);
+
+            List<Artworks> artworks = new List<Artworks>();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                string rawResponse = response.Content;
+                artworks = JsonConvert.DeserializeObject<List<Artworks>>(rawResponse);
+            }
+
+            return artworks;
         }
 
         /// <summary>
