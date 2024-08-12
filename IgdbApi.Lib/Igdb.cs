@@ -18,52 +18,79 @@ namespace IgdbApi.Lib
         private const string _clientId = "PRIVATE";
         private const string _clientSecret = "PRIVATE";
 
-        public FullGameData GetAllDataOnAGame(string nameOfGame)
+        public FullGameData GetAllDataOnAGame(string nameOfGame, int platformId = 0)
         {
-            FullGameData fullGameData = new FullGameData();
-
-            List<Game> games = GetGamesByName(nameOfGame);
-
-            // Check for a full name match
-            fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
-
-            if (fullGameData.Game == null)
+            try
             {
-                // Check for a partial name match
-                fullGameData.Game = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower())).FirstOrDefault();
-            }
+                FullGameData fullGameData = new FullGameData();
 
-            if (fullGameData.Game != null)
+                List<Game> games = GetGamesByName(nameOfGame);
+
+                if (platformId != 0)
+                {
+                    // Check for a full name match
+                    fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower() && x.platforms.Contains(platformId)).FirstOrDefault();
+
+                    if (fullGameData.Game == null)
+                    {
+                        // Check for a partial name match
+                        fullGameData.Game = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower()) && x.platforms.Contains(platformId)).FirstOrDefault();
+                    }
+                }
+                else
+                {
+                    // Check for a full name match
+                    fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
+
+                    if (fullGameData.Game == null)
+                    {
+                        // Check for a partial name match
+                        fullGameData.Game = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower())).FirstOrDefault();
+                    }
+                }
+
+                if (fullGameData.Game != null)
+                {
+                    fullGameData.GameDetails = GetGameById(fullGameData.Game.id.ToString());
+
+                    if (fullGameData.Game.involved_companies != null)
+                    {
+                        string involvedCompaniesIds = String.Join(",", fullGameData.Game.involved_companies);
+                        fullGameData.InvolvedCompanies = GetInvolvedCompanies(involvedCompaniesIds);
+                    }
+
+                    if (fullGameData.GameDetails[0].platforms != null)
+                    {
+                        string platformIds = String.Join(",", fullGameData.GameDetails[0].platforms);
+                        fullGameData.Platforms = GetPlatforms(platformIds);
+                    }
+
+                    if (fullGameData.GameDetails[0].genres != null)
+                    {
+                        string genreIds = String.Join(",", fullGameData.GameDetails[0].genres);
+                        fullGameData.Genres = GetGenres(genreIds);
+                    }
+
+                    if (fullGameData.GameDetails[0].artworks != null)
+                    {
+                        string artworkIds = String.Join(",", fullGameData.GameDetails[0].artworks);
+                        fullGameData.Artworks = GetArtworks(artworkIds);
+                        fullGameData.LargeArtworkUrls = _processImages.ProcessArrayOfImages(fullGameData.Artworks);
+                    }
+
+                    if (fullGameData.GameDetails[0].cover != 0)
+                    {
+                        fullGameData.Covers = GetCover(fullGameData.GameDetails[0].cover.ToString());
+                        fullGameData.LargeCoverUrl = _processImages.ProcessCoverUrl(fullGameData.Covers[0].url);
+                    }
+                }
+
+                return fullGameData;
+            }
+            catch (Exception ex)
             {
-                fullGameData.GameDetails = GetGameById(fullGameData.Game.id.ToString());
-
-                if (fullGameData.Game.involved_companies != null)
-                {
-                    string involvedCompaniesIds = String.Join(",", fullGameData.Game.involved_companies);
-                    fullGameData.InvolvedCompanies = GetInvolvedCompanies(involvedCompaniesIds);
-                }
-
-                if (fullGameData.GameDetails[0].platforms != null)
-                {
-                    string platformIds = String.Join(",", fullGameData.GameDetails[0].platforms);
-                    fullGameData.Platforms = GetPlatforms(platformIds);
-                }
-
-                if (fullGameData.GameDetails[0].artworks != null)
-                {
-                    string artworkIds = String.Join(",", fullGameData.GameDetails[0].artworks);
-                    fullGameData.Artworks = GetArtworks(artworkIds);
-                    fullGameData.LargeArtworkUrls = _processImages.ProcessArrayOfImages(fullGameData.Artworks);
-                }
-
-                if(fullGameData.GameDetails[0].cover != 0)
-                {
-                    fullGameData.Covers = GetCover(fullGameData.GameDetails[0].cover.ToString());
-                    fullGameData.LargeCoverUrl = _processImages.ProcessCoverUrl(fullGameData.Covers[0].url);
-                }
+                return null;
             }
-
-            return fullGameData;
         }
 
         /// <summary>
@@ -115,7 +142,7 @@ namespace IgdbApi.Lib
         {
             List<Game> games = new List<Game>();
 
-            string response = CallIgdbApi(Endpoints.Games, "fields name, involved_companies; search \"" + nameOfGame + "\";");
+            string response = CallIgdbApi(Endpoints.Games, "fields name, platforms, involved_companies; search \"" + nameOfGame + "\";");
 
             games = JsonConvert.DeserializeObject<List<Game>>(response);
 
@@ -226,6 +253,22 @@ namespace IgdbApi.Lib
             searchResult = JsonConvert.DeserializeObject<List<SearchResult>>(response);
 
             return searchResult;
+        }
+
+        /// <summary>
+        /// - Calls the 'genre' endpoint
+        /// </summary>
+        /// <param name="genreIds"></param>
+        /// <returns></returns>
+        public List<Genre> GetGenres(string genreIds)
+        {
+            List<Genre> genres = new List<Genre>();
+
+            string response = CallIgdbApi(Endpoints.Genres, "fields *; where id = (" + genreIds + ");");
+
+            genres = JsonConvert.DeserializeObject<List<Genre>>(response);
+
+            return genres;
         }
     }
 }

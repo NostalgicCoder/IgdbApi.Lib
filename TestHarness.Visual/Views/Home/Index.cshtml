@@ -15,19 +15,41 @@
 
     <p></p>
 
-    <h2>Summary:</h2>
+    <h5>Genre(s):</h5>
+
+    @{
+        if (Model.Genres != null)
+        {
+            <li>@String.Join(", ", Model.Genres.Select(x => x.name).ToArray())</li>
+        }
+    }
+
+    <p></p>
+
+    <h5>Platforms:</h5>
+
+    @{
+        if (Model.Platforms != null)
+        {
+            <li>@String.Join(", ", Model.Platforms.Select(x => x.name).ToArray())</li>
+        }
+    }
+
+    <p></p>
+
+    <h5>Summary:</h5>
 
     @Model.GameDetails[0].summary
 
     <p></p>
 
-    <h2>Storyline:</h2>
+    <h5>Storyline:</h5>
 
     @Model.GameDetails[0].storyline
 
     <p></p>
 
-    <h2>Artwork:</h2>
+    <h5>Artwork:</h5>
 
     @{
         if (Model.LargeArtworkUrls != null)

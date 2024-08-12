@@ -10,5 +10,6 @@
         public List<Artworks> Artworks { get; set; }
         public string LargeCoverUrl { get; set; }
         public List<string> LargeArtworkUrls { get; set; }
+        public List<Genre> Genres { get; set; } 
     }
 }

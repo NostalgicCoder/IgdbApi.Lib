@@ -1,4 +1,5 @@
 ﻿using IgdbApi.Lib;
+using IgdbApi.Lib.Enum;
 
 namespace TestHarness.Console
 {
@@ -9,7 +10,7 @@ namespace TestHarness.Console
             Igdb igdb = new Igdb();
 
             igdb.GetTwitchAccessToken();
-            igdb.GetAllDataOnAGame("fallout: new vegas");
+            igdb.GetAllDataOnAGame("rainbow islands", (int)PlatformEnum.Amiga);
 
             System.Console.ReadLine();
         }
