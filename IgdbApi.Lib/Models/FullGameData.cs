@@ -2,7 +2,7 @@
 {
     public class FullGameData
     {
-        public Game Game { get; set; }
+        public IgdbGame Game { get; set; }
         public List<GameDetails> GameDetails { get; set; }
         public List<Platform> Platforms { get; set; }
         public List<Cover> Covers { get; set; }

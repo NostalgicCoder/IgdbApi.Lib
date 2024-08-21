@@ -25,7 +25,7 @@ namespace IgdbApi.Lib
             {
                 FullGameData fullGameData = new FullGameData();
 
-                List<Game> games = GetGamesByName(nameOfGame);
+                List<IgdbGame> games = GetGamesByName(nameOfGame);
 
                 fullGameData.Game = _searchForGame.SearchForGameByNameAndPlatform(games, nameOfGame, platformId);
 
@@ -118,13 +118,13 @@ namespace IgdbApi.Lib
         /// </summary>
         /// <param name="nameOfGame"></param>
         /// <returns></returns>
-        public List<Game> GetGamesByName(string nameOfGame)
+        public List<IgdbGame> GetGamesByName(string nameOfGame)
         {
-            List<Game> games = new List<Game>();
+            List<IgdbGame> games = new List<IgdbGame>();
 
             string response = CallIgdbApi(Endpoints.Games, "fields name, platforms, involved_companies; search \"" + nameOfGame + "\";");
 
-            games = JsonConvert.DeserializeObject<List<Game>>(response);
+            games = JsonConvert.DeserializeObject<List<IgdbGame>>(response);
 
             return games;
         }

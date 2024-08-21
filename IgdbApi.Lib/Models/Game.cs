@@ -1,6 +1,6 @@
 ﻿namespace IgdbApi.Lib.Models
 {
-    public class Game
+    public class IgdbGame
     {
         public int id { get; set; }
         public int[] involved_companies { get; set; }

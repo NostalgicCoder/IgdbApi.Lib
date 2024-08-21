@@ -4,11 +4,11 @@ namespace IgdbApi.Lib.Class
 {
     public class SearchForGame
     {
-        private Game _gameResult;
+        private IgdbGame _gameResult;
 
-        public Game SearchForGameByNameAndPlatform(List<Game> games, string nameOfGame, int platformId = 0)
+        public IgdbGame SearchForGameByNameAndPlatform(List<IgdbGame> games, string nameOfGame, int platformId = 0)
         {
-            _gameResult = new Game();
+            _gameResult = new IgdbGame();
 
             if (platformId != 0)
             {
@@ -34,7 +34,7 @@ namespace IgdbApi.Lib.Class
             return _gameResult;
         }
 
-        private Game SearchForGameByNameOnly(List<Game> games, string nameOfGame)
+        private IgdbGame SearchForGameByNameOnly(List<IgdbGame> games, string nameOfGame)
         {
             // Search by direct match on name
             _gameResult = games.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
