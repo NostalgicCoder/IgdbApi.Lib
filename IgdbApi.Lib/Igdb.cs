@@ -11,6 +11,7 @@ namespace IgdbApi.Lib
     public class Igdb
     {
         private ProcessImages _processImages = new ProcessImages();
+        private SearchForGame _searchForGame = new SearchForGame();
         private Token _token = new Token();
 
         private RestClient _client = new RestClient("https://api.igdb.com/v4");
@@ -26,28 +27,7 @@ namespace IgdbApi.Lib
 
                 List<Game> games = GetGamesByName(nameOfGame);
 
-                if (platformId != 0)
-                {
-                    // Check for a full name match
-                    fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower() && x.platforms.Contains(platformId)).FirstOrDefault();
-
-                    if (fullGameData.Game == null)
-                    {
-                        // Check for a partial name match
-                        fullGameData.Game = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower()) && x.platforms.Contains(platformId)).FirstOrDefault();
-                    }
-                }
-                else
-                {
-                    // Check for a full name match
-                    fullGameData.Game = games.Where(x => x.name.ToLower() == nameOfGame.ToLower()).FirstOrDefault();
-
-                    if (fullGameData.Game == null)
-                    {
-                        // Check for a partial name match
-                        fullGameData.Game = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower())).FirstOrDefault();
-                    }
-                }
+                fullGameData.Game = _searchForGame.SearchForGameByNameAndPlatform(games, nameOfGame, platformId);
 
                 if (fullGameData.Game != null)
                 {
