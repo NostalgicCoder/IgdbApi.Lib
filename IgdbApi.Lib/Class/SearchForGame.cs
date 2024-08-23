@@ -42,11 +42,12 @@ namespace IgdbApi.Lib.Class
                 }
             }
 
-            if(platformId == 0)
+            // If still no result has been found
+            if(_gameResult.id == 0)
             {
                 _gameResult = SearchForGameByNameOnly(games, nameOfGame);
             }
-
+            
             return _gameResult;
         }
 
