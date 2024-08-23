@@ -1,4 +1,5 @@
-﻿using IgdbApi.Lib.Models;
+﻿using IgdbApi.Lib.Enum;
+using IgdbApi.Lib.Models;
 
 namespace IgdbApi.Lib.Class
 {
@@ -10,23 +11,38 @@ namespace IgdbApi.Lib.Class
         {
             _gameResult = new IgdbGame();
 
-            if (platformId != 0)
+            // INFO: Using this instead of a LAMBDA expression as sometimes the object 'Platforms' can be NULL for a item causing the search to explode and fail, this gets round it. Possible marginal performance penalty however due to it.
+            foreach(IgdbGame item in games)
             {
-                // Search by direct match on name and platform
-                _gameResult = games.Where(x => x.name.ToLower() == nameOfGame.ToLower() && x.platforms.Contains(platformId)).FirstOrDefault();
-
-                if(_gameResult == null)
+                if (item.platforms != null)
                 {
-                    // Search by direct match on platform but partial match on name
-                    _gameResult = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower()) && x.platforms.Contains(platformId)).FirstOrDefault();
-                }
+                    // Removes some rogue results
+                    if (item.platforms.Contains((int)PlatformEnum.HandHeldLCDGame))
+                    {
+                        games.Remove(item);
+                        break;
+                    }
 
-                if (_gameResult == null)
-                {
-                    _gameResult = SearchForGameByNameOnly(games, nameOfGame);
+                    if (platformId != 0)
+                    {
+                        // Search by direct match on name and platform
+                        if (item.name.ToLower() == nameOfGame.ToLower() && item.platforms.Contains(platformId))
+                        {
+                            _gameResult = item;
+                            break;
+                        }
+
+                        // Search by direct match on platform but partial match on name
+                        if (item.name.ToLower().Contains(nameOfGame.ToLower()) && item.platforms.Contains(platformId))
+                        {
+                            _gameResult = item;
+                            break;
+                        }
+                    }
                 }
             }
-            else
+
+            if(platformId == 0)
             {
                 _gameResult = SearchForGameByNameOnly(games, nameOfGame);
             }
@@ -43,6 +59,12 @@ namespace IgdbApi.Lib.Class
             {
                 // Search by partial match on name
                 _gameResult = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower())).FirstOrDefault();
+            }
+
+            if (_gameResult == null && games.Count() != 0)
+            {
+                // If unable to match on any other criteria then just pick the first result
+                _gameResult = games.FirstOrDefault();
             }
 
             return _gameResult;
