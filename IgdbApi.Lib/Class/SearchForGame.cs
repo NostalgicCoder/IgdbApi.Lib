@@ -11,43 +11,32 @@ namespace IgdbApi.Lib.Class
         {
             _gameResult = new IgdbGame();
 
-            // INFO: Using this instead of a LAMBDA expression as sometimes the object 'Platforms' can be NULL for a item causing the search to explode and fail, this gets round it. Possible marginal performance penalty however due to it.
-            foreach(IgdbGame item in games)
+            // Removes some rogue results
+            games.RemoveAll(x => x.platforms != null && x.platforms.Contains((int)PlatformEnum.HandHeldLCDGame));
+
+            if(platformId != 0)
             {
-                if (item.platforms != null)
+                List<IgdbGame> fullMatch = games.Where(x => x.name.ToLower() == nameOfGame.ToLower() && x.platforms != null && x.platforms.Contains(platformId)).ToList();
+                List<IgdbGame> partialMatch = games.Where(x => x.name.ToLower().Contains(nameOfGame.ToLower()) && x.platforms != null && x.platforms.Contains(platformId)).ToList();
+
+                if(fullMatch.Count != 0)
                 {
-                    // Removes some rogue results
-                    if (item.platforms.Contains((int)PlatformEnum.HandHeldLCDGame))
+                    _gameResult = fullMatch.FirstOrDefault();
+                }
+                else
+                {
+                    if(partialMatch.Count != 0)
                     {
-                        games.Remove(item);
-                        break;
+                        // You may get more then one result here, but we will take the first:
+                        _gameResult = partialMatch.FirstOrDefault();
                     }
-
-                    if (platformId != 0)
+                    else
                     {
-                        // Search by direct match on name and platform
-                        if (item.name.ToLower() == nameOfGame.ToLower() && item.platforms.Contains(platformId))
-                        {
-                            _gameResult = item;
-                            break;
-                        }
-
-                        // Search by direct match on platform but partial match on name
-                        if (item.name.ToLower().Contains(nameOfGame.ToLower()) && item.platforms.Contains(platformId))
-                        {
-                            _gameResult = item;
-                            break;
-                        }
+                        _gameResult = SearchForGameByNameOnly(games, nameOfGame);
                     }
                 }
             }
 
-            // If still no result has been found
-            if(_gameResult.id == 0)
-            {
-                _gameResult = SearchForGameByNameOnly(games, nameOfGame);
-            }
-            
             return _gameResult;
         }
 
