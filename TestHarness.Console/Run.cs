@@ -9,7 +9,7 @@ namespace TestHarness.Console
         {
             Igdb igdb = new Igdb();
 
-            igdb.GetTwitchAccessToken();
+            igdb.GetTwitchAccessToken("PRIVATE", "PRIVATE");
             igdb.GetAllDataOnAGame("rainbow islands", (int)PlatformEnum.Amiga);
 
             System.Console.ReadLine();

@@ -17,7 +17,7 @@ namespace TestHarness.Visual.Controllers
 
         public IActionResult Index(string nameOfGame)
         {
-            _igdb.GetTwitchAccessToken();
+            _igdb.GetTwitchAccessToken("PRIVATE", "PRIVATE");
 
             FullGameData fullGameData = _igdb.GetAllDataOnAGame(nameOfGame);
 

@@ -13,11 +13,9 @@ namespace IgdbApi.Lib
         private ProcessImages _processImages = new ProcessImages();
         private SearchForGame _searchForGame = new SearchForGame();
         private Token _token = new Token();
-
         private RestClient _client = new RestClient("https://api.igdb.com/v4");
 
-        private const string _clientId = "PRIVATE";
-        private const string _clientSecret = "PRIVATE";
+        private string _clientId;
 
         public FullGameData GetAllDataOnAGame(string nameOfGame, int platformId = 0)
         {
@@ -77,10 +75,14 @@ namespace IgdbApi.Lib
         /// Get the access token from Twitch that is required for access to IGDB API
         /// - Pass over 'clientId' and 'clientSecret' that is unique to the user
         /// </summary>
-        public void GetTwitchAccessToken()
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        public void GetTwitchAccessToken(string clientId, string clientSecret)
         {
-            RestRequest request = new RestRequest("https://id.twitch.tv/oauth2/token?client_id=" + _clientId + "&client_secret=" + _clientSecret + "&grant_type=client_credentials");
+            RestRequest request = new RestRequest("https://id.twitch.tv/oauth2/token?client_id=" + clientId + "&client_secret=" + clientSecret + "&grant_type=client_credentials");
             RestResponse response = _client.Execute(request, Method.Post);
+
+            _clientId = clientId;
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

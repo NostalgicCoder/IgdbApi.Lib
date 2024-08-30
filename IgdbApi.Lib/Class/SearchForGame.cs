@@ -36,6 +36,10 @@ namespace IgdbApi.Lib.Class
                     }
                 }
             }
+            else
+            {
+                _gameResult = SearchForGameByNameOnly(games, nameOfGame);
+            }
 
             return _gameResult;
         }
