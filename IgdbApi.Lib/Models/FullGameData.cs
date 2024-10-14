@@ -1,6 +1,8 @@
-﻿namespace IgdbApi.Lib.Models
+﻿using IgdbApi.Lib.Interfaces;
+
+namespace IgdbApi.Lib.Models
 {
-    public class FullGameData
+    public class FullGameData : IFullGameData
     {
         public IgdbGame Game { get; set; }
         public List<GameDetails> GameDetails { get; set; }

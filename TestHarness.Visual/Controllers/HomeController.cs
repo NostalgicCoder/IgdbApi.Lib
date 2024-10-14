@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using IgdbApi.Lib;
-using IgdbApi.Lib.Models;
+using IgdbApi.Lib.Interfaces;
 
 namespace TestHarness.Visual.Controllers
 {
     public class HomeController : Controller
     {
-        private Igdb _igdb = new Igdb();
+        private IIgdb _igdb = new Igdb();
 
         private readonly ILogger<HomeController> _logger;
 
@@ -17,9 +17,10 @@ namespace TestHarness.Visual.Controllers
 
         public IActionResult Index(string nameOfGame)
         {
+            // Pass over 'clientId' and 'clientSecret' that is unique to the users (Twitch access) account here:
             _igdb.GetTwitchAccessToken("PRIVATE", "PRIVATE");
 
-            FullGameData fullGameData = _igdb.GetAllDataOnAGame(nameOfGame);
+            IFullGameData fullGameData = _igdb.GetAllDataOnAGame(nameOfGame);
 
             if(fullGameData.Game != null && fullGameData.Covers != null)
             {

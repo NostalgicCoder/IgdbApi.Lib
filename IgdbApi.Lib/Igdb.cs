@@ -1,14 +1,12 @@
 ﻿using IgdbApi.Lib.Class;
+using IgdbApi.Lib.Interfaces;
 using IgdbApi.Lib.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
 namespace IgdbApi.Lib
 {
-    // https://www.igdb.com/
-    // https://api-docs.igdb.com/#authentication
-
-    public class Igdb
+    public class Igdb : IIgdb
     {
         private ProcessImages _processImages = new ProcessImages();
         private SearchForGame _searchForGame = new SearchForGame();
@@ -17,11 +15,18 @@ namespace IgdbApi.Lib
 
         private string _clientId;
 
-        public FullGameData GetAllDataOnAGame(string nameOfGame, int platformId = 0)
+        /// <summary>
+        /// This is called by either the 'TestHarness.Console' OR 'TestHarness.Visual' project - One is better for speed based API testing and one is better for pre-viewing the visual data in a real world scenario
+        /// - If parent level data can be aquired from the API then call child requests to aquire more detailed information for the result
+        /// </summary>
+        /// <param name="nameOfGame"></param>
+        /// <param name="platformId"></param>
+        /// <returns></returns>
+        public IFullGameData GetAllDataOnAGame(string nameOfGame, int platformId = 0)
         {
             try
             {
-                FullGameData fullGameData = new FullGameData();
+                IFullGameData fullGameData = new FullGameData();
 
                 List<IgdbGame> games = GetGamesByName(nameOfGame);
 
@@ -67,13 +72,14 @@ namespace IgdbApi.Lib
             }
             catch (Exception ex)
             {
+                // TODO: A more detailed error response can be feedback here in the future to calling applications, for now this is fine.
                 return null;
             }
         }
 
         /// <summary>
         /// Get the access token from Twitch that is required for access to IGDB API
-        /// - Pass over 'clientId' and 'clientSecret' that is unique to the user
+        /// - Pass over 'clientId' and 'clientSecret' that is unique to the users account
         /// </summary>
         /// <param name="clientId"></param>
         /// <param name="clientSecret"></param>
@@ -93,6 +99,7 @@ namespace IgdbApi.Lib
 
         /// <summary>
         /// Call the IGDB (Internet Gaming Database) API
+        /// - Pass over the requests command via the 'headerbody' value and return the response as a string
         /// </summary>
         /// <param name="endpoint"></param>
         /// <param name="headerBody"></param>
