@@ -14,5 +14,6 @@ namespace IgdbApi.Lib.Interfaces
         List<Artworks> GetArtworks(string artworkIds);
         List<SearchResult> Search(string keyword, int resultLimit = 50);
         List<Genre> GetGenres(string genreIds);
+        List<ReleaseDates> GetReleaseDates(string gameId, int platformId);
     }
 }

@@ -12,7 +12,7 @@ namespace TestHarness.Console
 
             // Pass over 'clientId' and 'clientSecret' that is unique to the users (Twitch access) account here:
             igdb.GetTwitchAccessToken("PRIVATE", "PRIVATE");
-            igdb.GetAllDataOnAGame("rainbow islands", (int)PlatformEnum.Amiga);
+            igdb.GetAllDataOnAGame("Silent Hill 2", (int)PlatformEnum.PS5);
 
             System.Console.ReadLine();
         }

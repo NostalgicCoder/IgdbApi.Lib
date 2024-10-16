@@ -13,5 +13,6 @@ namespace IgdbApi.Lib.Interfaces
         string LargeCoverUrl { get; set; }
         List<string> LargeArtworkUrls { get; set; }
         List<Genre> Genres { get; set; }
+        List<ReleaseDates> ReleaseDates { get; set; }
     }
 }

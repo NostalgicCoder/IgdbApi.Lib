@@ -36,6 +36,8 @@ namespace IgdbApi.Lib
                 {
                     fullGameData.GameDetails = GetGameById(fullGameData.Game.id.ToString());
 
+                    fullGameData.ReleaseDates = GetReleaseDates(fullGameData.Game.id.ToString(), platformId);
+
                     if (fullGameData.Game.involved_companies != null)
                     {
                         string involvedCompaniesIds = String.Join(",", fullGameData.Game.involved_companies);
@@ -258,6 +260,37 @@ namespace IgdbApi.Lib
             genres = JsonConvert.DeserializeObject<List<Genre>>(response);
 
             return genres;
+        }
+
+        /// <summary>
+        /// Returns release date information for a game
+        /// - Calls the 'release_dates' endpoint
+        /// - Sometimes you will get multiple release dates returned for the same game and platform due to different editions of the game being released, IE: Deluxe, Regular
+        /// - Appears some date values returned from IGDB API are in millisecond date format, so are not human readable without conversion.
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="platformId"></param>
+        /// <returns></returns>
+        public List<ReleaseDates> GetReleaseDates(string gameId, int platformId)
+        {
+            List<ReleaseDates> releaseDates = new List<ReleaseDates>();
+
+            string headerBody = string.Empty;
+
+            if (platformId == 0)
+            {
+                headerBody = "fields *; where game = " + gameId + ";";
+            }
+            else
+            {
+                headerBody = "fields *; where game = " + gameId + "& platform = " + platformId.ToString() + ";";
+            }
+
+            string response = CallIgdbApi(Endpoints.ReleaseDates, headerBody);
+
+            releaseDates = JsonConvert.DeserializeObject<List<ReleaseDates>>(response);
+
+            return releaseDates;
         }
     }
 }

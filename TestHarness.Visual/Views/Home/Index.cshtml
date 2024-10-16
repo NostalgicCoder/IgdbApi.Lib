@@ -15,6 +15,17 @@
 
     <p></p>
 
+    <h5>Release Date(s):</h5>
+
+    @{
+        if (Model.ReleaseDates != null)
+        {
+            <li>@String.Join(", ", Model.ReleaseDates.Select(x => x.human).ToArray())</li>
+        }
+    }
+
+    <p></p>
+
     <h5>Genre(s):</h5>
 
     @{
