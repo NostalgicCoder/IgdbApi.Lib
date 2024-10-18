@@ -1,73 +1,90 @@
-﻿@using IgdbApi.Lib.Models
-
-@model FullGameData;
+﻿@model GameSearch;
 
 @{
-    ViewData["Title"] = Model.GameDetails[0].name;
+    ViewData["Title"] = "Search For Game:";
 }
+
+<h2>Search For Game:</h2>
+
+<form method="post" asp-action="Index">
+
+    <label>Keyword:</label>
+    <input asp-for="NameOfGame" class="form-control" style="width:400px" />
+
+    <p></p>
+
+    <label>Platform:</label>
+    <select class="form-select" asp-for="SelectedPlatform" asp-items="@Model.Platforms" style="width:200px">
+        <option>Please select one</option>
+    </select>
+
+    <p></p>
+
+    <button type="submit" class="btn btn-primary">Search<i class="bi bi-filter"></i></button>
+
+</form>
+
+<p></p>
 
 <div>
 
-    <h2>@Model.GameDetails[0].name:</h2>
-
-    <img src="@Model.LargeCoverUrl" width="264" height="374" />
-    <img src="@Model.Covers[0].url"/>
-
-    <p></p>
-
-    <h5>Release Date(s):</h5>
-
     @{
-        if (Model.ReleaseDates != null)
+        if (Model.FullGameData.Game != null && Model.FullGameData.Covers != null)
         {
-            <li>@String.Join(", ", Model.ReleaseDates.Select(x => x.human).ToArray())</li>
-        }
-    }
+            <h2>@Model.FullGameData.GameDetails[0].name:</h2>
 
-    <p></p>
+            <img src="@Model.FullGameData.LargeCoverUrl" width="264" height="374" />
+            <img src="@Model.FullGameData.Covers[0].url" />
 
-    <h5>Genre(s):</h5>
+            <p></p>
 
-    @{
-        if (Model.Genres != null)
-        {
-            <li>@String.Join(", ", Model.Genres.Select(x => x.name).ToArray())</li>
-        }
-    }
+            <h5>Release Date(s):</h5>
 
-    <p></p>
-
-    <h5>Platforms:</h5>
-
-    @{
-        if (Model.Platforms != null)
-        {
-            <li>@String.Join(", ", Model.Platforms.Select(x => x.name).ToArray())</li>
-        }
-    }
-
-    <p></p>
-
-    <h5>Summary:</h5>
-
-    @Model.GameDetails[0].summary
-
-    <p></p>
-
-    <h5>Storyline:</h5>
-
-    @Model.GameDetails[0].storyline
-
-    <p></p>
-
-    <h5>Artwork:</h5>
-
-    @{
-        if (Model.LargeArtworkUrls != null)
-        {
-            foreach (string item in Model.LargeArtworkUrls)
+            if (Model.FullGameData.ReleaseDates != null)
             {
-                <img src="@item" />
+                <li>@String.Join(", ", Model.FullGameData.ReleaseDates.Select(x => x.human).ToArray())</li>
+            }
+
+            <p></p>
+
+            <h5>Genre(s):</h5>
+
+            if (Model.FullGameData.Genres != null)
+            {
+                <li>@String.Join(", ", Model.FullGameData.Genres.Select(x => x.name).ToArray())</li>
+            }
+
+            <p></p>
+
+            <h5>Platforms:</h5>
+
+            if (Model.FullGameData.Platforms != null)
+            {
+                <li>@String.Join(", ", Model.FullGameData.Platforms.Select(x => x.name).ToArray())</li>
+            }
+
+            <p></p>
+
+            <h5>Summary:</h5>
+
+            @Model.FullGameData.GameDetails[0].summary
+
+            <p></p>
+
+            <h5>Storyline:</h5>
+
+            @Model.FullGameData.GameDetails[0].storyline
+
+            <p></p>
+
+            <h5>Artwork:</h5>
+
+            if (Model.FullGameData.LargeArtworkUrls != null)
+            {
+                foreach (string item in Model.FullGameData.LargeArtworkUrls)
+                {
+                    <img src="@item" />
+                }
             }
         }
     }
