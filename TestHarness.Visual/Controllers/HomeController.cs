@@ -22,11 +22,12 @@ namespace TestHarness.Visual.Controllers
             // Pass over 'clientId' and 'clientSecret' that is unique to the users (Twitch access) account here:
             _igdb.GetTwitchAccessToken("PRIVATE", "PRIVATE");
 
-            if(!string.IsNullOrEmpty(gameSearch.NameOfGame) && !string.IsNullOrEmpty(gameSearch.SelectedPlatform) && gameSearch.SelectedPlatform != "Please select one")
+            if (!string.IsNullOrEmpty(gameSearch.NameOfGame) && !string.IsNullOrEmpty(gameSearch.SelectedPlatform) && gameSearch.SelectedPlatform != "Please select one")
             {
                 gameSearch.FullGameData = _igdb.GetAllDataOnAGame(gameSearch.NameOfGame, Int32.Parse(gameSearch.SelectedPlatform));
             }
-            else
+
+            if (gameSearch.FullGameData == null)
             {
                 gameSearch.FullGameData = new FullGameData();
             }
